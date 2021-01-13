@@ -54,7 +54,7 @@ void queue_create(queue* q) {
 
 void print_queue(queue* q) {
 	for (int j = 0; j < q->top; j++) {
-		printf("%d id %d at (%d %d) errors %d\n", j, q->organisms[j].id, q->organisms[j].startx, q->organisms[j].starty, q->organisms[j].errors);
+		printf("%d id %d with size (%d, %d) at (%d %d) errors %d\n", j, q->organisms[j].id, q->organisms[j].width, q->organisms[j].height, q->organisms[j].startx, q->organisms[j].starty, q->organisms[j].errors);
 	}
 }
 
@@ -81,7 +81,7 @@ void update_queue(queue* q) {
 }
 
 int append_queue(queue* q, organism* org) {
-	printf("pushing into queue Organism %d\n", org->id);
+	printf("pushing into queue Organism [%d, %d]\n", org->width, org->height);
 	if (q->top == q->size) {
 		organism *newq = calloc(q->size*2, sizeof(organism));
 		if (!(newq)) {
@@ -251,7 +251,7 @@ int organism_create(organism* org, int startx, int starty, int width, int height
 }
 
 void move(organism* org) {
-	printf("moving organism %d by (%d %d)\n", org->id, org->deltax, org->deltay);
+	//printf("moving organism %d by (%d %d)\n", org->id, org->deltax, org->deltay);
 	org->ptrx += org->deltax;
 	org->ptry += org->deltay;
 }
@@ -293,17 +293,17 @@ int array_create(array* arr, int size) {
 
 int does_fit(array* memory, int x, int y, int w, int h) {
 	return ((x >= 0) && (x < memory->size) && 
-		(x+w >= 0) && (x+w < memory->size) &&
+		(x+h >= 0) && (x+h < memory->size) &&
 		(y >= 0) && (y < memory->size) &&
-		(y+h >= 0) && (y+h < memory->size));
+		(y+w >= 0) && (y+w < memory->size));
 }
 
 int memory_is_free(array* memory, int x, int y, int w, int h) {
 	if (!does_fit(memory, x, y, w, h)) {
 		return 0;
 	}
-	for (int i = x; i < x+w; i++) {
-		for (int j = y; j < y+h; j++) {
+	for (int i = x; i < x+h; i++) {
+		for (int j = y; j < y+w; j++) {
 			if (!(memory->content[i*memory->size+j]%4 == 0)) {
 				return 0;
 			}
@@ -316,8 +316,8 @@ int memory_is_active(array* memory, int x, int y, int w, int h) {
 	if (!does_fit(memory, x, y, w, h)) {
 		return 0;
 	}
-	for (int i = x; i < x+w; i++) {
-		for (int j = y; j < y+h; j++) {
+	for (int i = x; i < x+h; i++) {
+		for (int j = y; j < y+w; j++) {
 			if (!(memory->content[i*memory->size+j]%4 == 2)) {
 				return 0;
 			}
@@ -334,8 +334,8 @@ int memory_allocate(array* memory, int x, int y, int w, int h) {
 		printf("can't allocate: chunk %d %d, %d %d not free\n", x, y, w, h);
 		return -1;
 	}
-	for (int i = x; i < x+w; i++) {
-		for (int j = y; j < y+h; j++) {
+	for (int i = x; i < x+h; i++) {
+		for (int j = y; j < y+w; j++) {
 			memory->content[i*memory->size+j] -= memory->content[i*memory->size+j]%4;
 			memory->content[i*memory->size+j] += 1;
 		}
@@ -363,8 +363,8 @@ int memory_free(array* memory, int x, int y, int w, int h) {
 	if (!does_fit(memory, x, y, w, h)) {
 		return 0;
 	}
-	for (int i = x; i < x+w; i++) {
-		for (int j = y; j < y+h; j++) {
+	for (int i = x; i < x+h; i++) {
+		for (int j = y; j < y+w; j++) {
 			memory->content[i*memory->size+j] -= memory->content[i*memory->size+j]%4;
 		}
 	}
@@ -410,7 +410,7 @@ int array_set_command(array* arr, int x, int y, char code) {
 }
 
 int left(organism* org) {
-	printf("left\n");
+	//printf("left\n");
 	if (!org) {
 		return -1;
 	}
@@ -420,7 +420,7 @@ int left(organism* org) {
 }
 
 int right(organism* org) {
-	printf("right\n");
+	//printf("right\n");
 	if (!org) {
 		return -1;
 	}
@@ -430,7 +430,7 @@ int right(organism* org) {
 }
 
 int up(organism* org) {
-	printf("up\n");
+	//printf("up\n");
 	if (!org) {
 		return -1;
 	}
@@ -449,14 +449,14 @@ int down(organism* org) {
 }
 
 int Stack(array* memory, organism* org) {
-	printf("stacking\n");
+	//printf("stacking\n");
 	char reg = array_get_command_code(memory, org->ptrx + org->startx+org->deltax, org->ptry + org->starty+org->deltay);
 	int x;
 	int y;
 	if (!(get_register_value(org, reg, &x, &y) == 0)) {
 		return -1;
 	}
-	printf("stacking %d %d\n", x, y);
+	//printf("stacking %d %d\n", x, y);
 	org->stackx[org->stacktop] = x;
 	org->stacky[org->stacktop] = y;
 	org->stacktop++;
@@ -466,7 +466,7 @@ int Stack(array* memory, organism* org) {
 }
 
 int Pop(array* memory, organism* org) {
-	printf("popping\n");
+	//printf("popping\n");
 	if (org->stacktop == 0) {
 		printf("can't pop from empty stack\n");
 		return -1; //empty stack
@@ -477,7 +477,7 @@ int Pop(array* memory, organism* org) {
 	if (!(set_register_value(org, reg, x, y) == 0)) {
 		return -1;
 	}
-	printf("popped (%d %d) (memory %d %d) into %c\n", x, y, org->ptrx+org->startx+org->deltax, org->ptry+org->starty+org->deltay, commands[reg]);
+	//printf("popped (%d %d) (memory %d %d) into %c\n", x, y, org->ptrx+org->startx+org->deltax, org->ptry+org->starty+org->deltay, commands[reg]);
 	org->stacktop--;
 	//this command is longer, but it is still one command
 	move(org);
@@ -485,7 +485,7 @@ int Pop(array* memory, organism* org) {
 }
 
 int jumpc(array* memory, organism* org) {
-	printf("jumping");
+	//printf("jumping");
 	int reg = array_get_command_code(memory, org->ptrx + org->startx+org->deltax, org->ptry + org->starty+org->deltay);
 	if ((reg < 0) || (reg >= N_OF_COMMANDS)) {
 		printf("register %c doesn't exist\n", commands[reg]);
@@ -497,10 +497,10 @@ int jumpc(array* memory, organism* org) {
 	int ys;
 	if ((commands[reg] == 'x') || (commands[reg] == 'y')) {
 		reg = commands[reg];
-		printf("partial jump %c\n", reg);
+		//printf("partial jump %c\n", reg);
 		x = (reg == 'x') ? 1 : 0;
 		y = (reg == 'y') ? 1 : 0;
-		printf("%d %d\n", org->ptrx + org->startx+org->deltax*2, org->ptry + org->starty+org->deltay*2);
+		//printf("%d %d\n", org->ptrx + org->startx+org->deltax*2, org->ptry + org->starty+org->deltay*2);
 		reg = array_get_command_code(memory, org->ptrx + org->startx+org->deltax*2, org->ptry + org->starty+org->deltay*2);
 		//
 		move(org);
@@ -520,7 +520,7 @@ int jumpc(array* memory, organism* org) {
 }
 
 int increment(array* memory, organism* org) {
-	printf("increment\n");
+	//printf("increment\n");
 	int reg = array_get_command_code(memory, org->ptrx + org->startx+org->deltax, org->ptry + org->starty+org->deltay);
 	if ((reg < 0) || (reg >= N_OF_COMMANDS)) {
 		printf("register %c doesn't exist\n", commands[reg]);
@@ -532,10 +532,10 @@ int increment(array* memory, organism* org) {
 	int ys;
 	if ((commands[reg] == 'x') || (commands[reg] == 'y')) {
 		reg = commands[reg];
-		printf("partial increment %c\n", reg);
+		//printf("partial increment %c\n", reg);
 		x = (reg == 'x') ? 1 : 0;
 		y = (reg == 'y') ? 1 : 0;
-		printf("%d %d\n", org->ptrx + org->startx+org->deltax*2, org->ptry + org->starty+org->deltay*2);
+		//printf("%d %d\n", org->ptrx + org->startx+org->deltax*2, org->ptry + org->starty+org->deltay*2);
 		reg = array_get_command_code(memory, org->ptrx + org->startx+org->deltax*2, org->ptry + org->starty+org->deltay*2);
 		//this command is longer, but it is still one command
 		move(org);
@@ -543,18 +543,18 @@ int increment(array* memory, organism* org) {
 	if (!(get_register_value(org, reg, &xs, &ys) == 0)) {
 		return -1;
 	}
-	printf("value of %c : %d %d\n", commands[reg], xs, ys);
+	//printf("value of %c : %d %d\n", commands[reg], xs, ys);
 	if (!(set_register_value(org, reg, xs+x, ys+y) == 0)) {
 		return -1;
 	}
-	printf("changed value of %c by: %d %d\n", commands[reg], x, y);
+	//printf("changed value of %c by: %d %d\n", commands[reg], x, y);
 	//this command is longer, but it is still one command
 	move(org);
 	return 0;
 }
 
 int decrement(array* memory, organism* org) {
-	printf("decrement\n");
+	//printf("decrement\n");
 	int reg = array_get_command_code(memory, org->ptrx + org->startx+org->deltax, org->ptry + org->starty+org->deltay);
 	if ((reg < 0) || (reg >= N_OF_COMMANDS)) {
 		printf("register %c doesn't exist\n", commands[reg]);
@@ -566,10 +566,10 @@ int decrement(array* memory, organism* org) {
 	int ys;
 	if ((commands[reg] == 'x') || (commands[reg] == 'y')) {
 		reg = commands[reg];
-		printf("partial decrement %c\n", reg);
+		//printf("partial decrement %c\n", reg);
 		x = (reg == 'x') ? 1 : 0;
 		y = (reg == 'y') ? 1 : 0;
-		printf("%d %d\n", org->ptrx + org->startx+org->deltax*2, org->ptry + org->starty+org->deltay*2);
+		//printf("%d %d\n", org->ptrx + org->startx+org->deltax*2, org->ptry + org->starty+org->deltay*2);
 		reg = array_get_command_code(memory, org->ptrx + org->startx+org->deltax*2, org->ptry + org->starty+org->deltay*2);
 		//this command is longer, but it is still one command
 		move(org);
@@ -577,11 +577,11 @@ int decrement(array* memory, organism* org) {
 	if (!(get_register_value(org, reg, &xs, &ys) == 0)) {
 		return -1;
 	}
-	printf("value of %c : %d %d\n", commands[reg], xs, ys);
+	//printf("value of %c : %d %d\n", commands[reg], xs, ys);
 	if (!(set_register_value(org, reg, xs-x, ys-y) == 0)) {
 		return -1;
 	}
-	printf("changed value of %c by: %d %d\n", commands[reg], -x, -y);
+	//printf("changed value of %c by: %d %d\n", commands[reg], -x, -y);
 	//this command is longer, but it is still one command
 	move(org);
 	return 0;
@@ -589,7 +589,7 @@ int decrement(array* memory, organism* org) {
 
 int write_instance(array* memory, organism* org) {
 	//print_array(memory);
-	printf("\n\n\n\nwriting an instance\n");
+	//printf("\n\n\n\nwriting an instance\n");
 	int reg1 = array_get_command_code(memory, org->ptrx + org->startx+org->deltax, org->ptry + org->starty+org->deltay);
 	int reg2 = array_get_command_code(memory, org->ptrx + org->startx+org->deltax*2, org->ptry + org->starty+org->deltay*2);
 	int addressx;
@@ -612,13 +612,13 @@ int write_instance(array* memory, organism* org) {
 		printf("unknown command %d\n", c);
 		return -1;
 	}
-	printf("command %c\n", commands[c]);
+	//printf("command %c\n", commands[c]);
 	//c = commands[c];
 	//if (!(а_command(memory, addressx, addressy, c) == 0)) {
 	//	return -1;
 	//}
 	memory->content[addressx*memory->size+addressy] = (c<<2)+1;
-	printf("wrote command %d (%c) (%d %d) on (%d %d) (register %c) successfully\n", \
+	//printf("wrote command %d (%c) (%d %d) on (%d %d) (register %c) successfully\n", \
 	c, commands[c], x, y, addressx, addressy, commands[reg1]);
 	//this command is longer, but it is still one command
 	move(org);
@@ -627,7 +627,7 @@ int write_instance(array* memory, organism* org) {
 }
 
 int load_instance(array* memory, organism* org) {
-	printf("loading instance\n");
+	//printf("loading instance\n");
 	int reg_dest = array_get_command_code(memory, org->ptrx + org->startx+org->deltax*2, org->ptry + org->starty+org->deltay*2);
 	int reg_source = array_get_command_code(memory, org->ptrx + org->startx+org->deltax, org->ptry + org->starty+org->deltay);
 	if ((reg_source < 0) || (reg_source >= N_OF_COMMANDS)) {
@@ -653,7 +653,7 @@ int load_instance(array* memory, organism* org) {
 		printf("can't set value of register %c", commands[reg_dest]);
 		return -1;
 	}
-	printf("loaded inst successfully from (%d %d) %c [%d %d]\n", x, y, commands[command], command/10, command%10);
+	//printf("loaded inst successfully from (%d %d) %c [%d %d]\n", x, y, commands[command], command/10, command%10);
 	//this command is longer, but it is still one command
 	move(org);
 	move(org);
@@ -661,16 +661,16 @@ int load_instance(array* memory, organism* org) {
 }
 
 int find_template(array* memory, organism* org) {
-	printf("looking_for_template\n");
+	//printf("looking_for_template\n");
 	int x = org->ptrx + org->startx + org->deltax;
 	int y = org->ptry + org->starty + org->deltay;
 	int reg = array_get_command_code(memory, x, y);
-	printf("registercode %d\n", reg);
+	//printf("registercode %d\n", reg);
 
 	int maxlen = (org->width < org->height) ? (org->height) : (org->width);
-	printf("length of template 1: %d %i\n", maxlen, maxlen);
+	//printf("length of template 1: %d %i\n", maxlen, maxlen);
 	int template[25];// = calloc(maxlen, sizeof(int));
-	printf("length of template 2: %d %i\n", maxlen, maxlen);
+	//printf("length of template 2: %d %i\n", maxlen, maxlen);
 //	if (!template) {
 //		printf("couldn't allocate memory to store template\n");
 //		return -1;
@@ -712,6 +712,7 @@ int find_template(array* memory, organism* org) {
 		printf("template not found\n");
 		return -1;
 	}
+	print("set the value of register - size [%d, %d]", x, y)
 	if (!(set_register_value(org, reg, x, y) == 0)) {
 		return -1;
 	}
@@ -721,7 +722,7 @@ int find_template(array* memory, organism* org) {
 }
 
 int allocate_child(array* memory, organism* org) {
-	printf("allocating child\n");
+	//printf("allocating child\n");
 	int child_size = array_get_command_code(memory, org->ptrx + org->startx+org->deltax, org->ptry + org->starty+org->deltay);
 	int child_start = array_get_command_code(memory, org->ptrx + org->startx+org->deltax*2, org->ptry + org->starty+org->deltay*2);
 	if ((child_size < 0) || (child_size >= N_OF_COMMANDS) || (child_start < 0) || (child_start >= N_OF_COMMANDS)) {
@@ -745,7 +746,7 @@ int allocate_child(array* memory, organism* org) {
 	int x = org->ptrx + org->startx+org->deltax*2;
 	int y = org->ptry + org->starty+org->deltay*2;
 	int is_space_found = 0;
-	printf("looking for space in direction (%d %d) starting from (%d %d)\n", org->deltax, org->deltay, x, y);
+	//printf("looking for space in direction (%d %d) starting from (%d %d)\n", org->deltax, org->deltay, x, y);
     for (int i = 2; ((i < memory->size) && (!is_space_found) && 
 	(x >= 0) && (y >= 0) && (x < memory->size) && (y < memory->size)); i++) {
 		x += org->deltax;
@@ -761,11 +762,11 @@ int allocate_child(array* memory, organism* org) {
 		}
 	}
     if (is_space_found) {
-		printf("allocatin_memory\n");
+		//printf("allocatin_memory\n");
         if (!(memory_allocate(memory, org->childx, org->childy, width, height) == 0)) {
 			return -1;
 		}
-		printf("allocated successfully\n");
+		//printf("allocated successfully\n");
 		org->child_width = width;
 		org->child_height = height;
 	}
@@ -804,7 +805,7 @@ int one(array* memory, organism* org) {
 }
 
 int subtract(array* memory, organism* org) {
-	printf("subtracting\n");
+	//printf("subtracting\n");
 	int reg1 = array_get_command_code(memory, org->ptrx + 
 	org->startx+org->deltax, org->ptry + org->starty+org->deltay);
 	int reg2 = array_get_command_code(memory, org->ptrx + 
@@ -835,7 +836,7 @@ int subtract(array* memory, organism* org) {
 }
 
 int split_child(array* memory, organism* org, queue* q) {
-	printf("splitting child\n");
+	//printf("splitting child\n");
 	if ((org->child_width < 0) || (org->child_height < 0)) {
 		printf("child with negative area\n");
 		return -1;
@@ -994,6 +995,23 @@ organism org;
 queue q;
 size_t iteration = 0;
 
+
+// id, startX, startY, width, height, ptrx, ptry, deltaX, deltaY,
+//     ax, ay, bx, by, cx, cy, dx, dy, stackTop, errors
+EMSCRIPTEN_KEEPALIVE
+void get_queue_info(queue *q) {
+	organism *o;
+	for (size_t i = 0; i < q->top; i++) {
+		if (get_queue(q, o, i) == 0) {
+			EM_ASM({
+				updateDOMOrganisms($0, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+			}, o->id, o->startx, o->starty, o->width, o->height, o->ptrx, o->ptry, o->deltax, o->deltay, o->stacktop,
+			o->errors, o->reproduction_cycle, o->parent_id);
+		}
+		// registers not added
+	}
+}
+
 EMSCRIPTEN_KEEPALIVE
 int main() {
 	array_create(&arr, 200);
@@ -1015,7 +1033,7 @@ int run(size_t iterations_to_run) {
 	while (iteration < i + iterations_to_run) {
 		top = 0;
 		n = q.top;
-		printf("\n\nITERATION %zu\n", iteration);
+		//printf("\n\nITERATION %zu\n", iteration);
 		while (top < n) {
 			//get_queue(&q, &O, top);
 			if (get_queue(&q, &org, top) == 0) {
@@ -1031,21 +1049,12 @@ int run(size_t iterations_to_run) {
 	EM_ASM({
 		updateIteration($0);
 	}, iteration);
+	print_queue(&q);
+	get_queue_info(&q);
 	return 0;
 }
 
 
-EMSCRIPTEN_KEEPALIVE
-int get_queue_info(queue *q) {
-	organism *o;
-	for (size_t i = 0; i < q->top; i++) {
-		if (get_queue(q, o, i) == 0) {
-			EM_ASM({
-
-			}, o->);
-		}
-	}
-}
 
 // EMSCRIPTEN_KEEPALIVE
 // int main() {

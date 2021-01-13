@@ -1613,8 +1613,9 @@ var tempI64;
 // === Body ===
 
 var ASM_CONSTS = {
-  2421: function() {alert("Data initialized. Ready for starting simulation");},  
- 2500: function($0) {updateIteration($0);}
+  1739: function($0, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) {updateDOMOrganisms($0, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)},  
+ 1829: function() {alert("Data initialized. Ready for starting simulation");},  
+ 1891: function($0) {updateIteration($0);}
 };
 
 
@@ -4391,6 +4392,9 @@ var ___wasm_call_ctors = Module["___wasm_call_ctors"] = createExportWrapper("__w
 
 /** @type {function(...*):?} */
 var _free = Module["_free"] = createExportWrapper("free");
+
+/** @type {function(...*):?} */
+var _get_queue_info = Module["_get_queue_info"] = createExportWrapper("get_queue_info");
 
 /** @type {function(...*):?} */
 var ___original_main = Module["___original_main"] = createExportWrapper("__original_main");

@@ -3,10 +3,10 @@ const container = document.querySelector(".containerSim")
 const SVGchildrenSpace = document.getElementById("childrenSpace")
 const iterationsInModal = document.getElementById("modalIteration") 
 const organisms = []
+const organismsMap = new Map()
 let popOver;
 let runIterations;
-let id = 0
-// Global
+
 
 
 
@@ -16,8 +16,10 @@ Module.onRuntimeInitialized = () => {
 }
 
 class OrganismDOM {
-    constructor(startX, startY, width, height) {
-        this.id = id++;
+    constructor(id, startX, startY, width, height) {
+        
+
+        this.id = id
         this.startX = startX
         this.startY = startY
         this.width = width
@@ -25,6 +27,20 @@ class OrganismDOM {
         this.isSelected = false
         this.children = []
         this.init()
+
+
+        // Later
+
+        // organism.stackTop = stackTop
+        // organism.ptr = [ptrx, ptry]
+        // organism.delta = [deltaX, deltaY]
+        // organism.a = [ax, ay]
+        // organism.b = [bx, by]
+        // organism.c = [cx, cy]
+        // organism.d = [dx, dy]
+        // organism.errors = errors
+        // organism.reproduction_cycle = reproduction_cycle
+        // organism.parent = ...
     }
 
     isTouched(x, y) {
@@ -65,8 +81,15 @@ class OrganismDOM {
     }
 
     displayInfo() {
-        console.log(`.......`)
-        return '.....'
+        return `parent id: ${this.parentId}
+        size: [${this.width},${this.height}]
+        coors: [${this.startX},${this.startY}]
+        amount of stack elements: ${this.stackTop}
+        children amount: ${this.children.length}
+        next command: [${this.ptr}]
+        delta: ${this.delta}
+        errors: ${this.errors}
+        reproduction cycle: ${this.reproduction_cycle}`
     }
 
     getStartElement() {
@@ -81,9 +104,13 @@ class OrganismDOM {
         return container.childNodes[this.startX + Math.floor(this.height / 2)].childNodes[this.startY + Math.floor(this.width / 2)]
     }
 
+    getPtrElement() {
+        return container.childNodes[this.startX + this.ptrx].childNodes[this.startY + this.ptry]
+    }
+
     hookPopOver() {
         popOver = new bootstrap.Popover(this.getStartElement(), {
-            content: this.displayInfo(), trigger: "manual", title: "Organism", placement: "left"
+            content: this.displayInfo(), trigger: "manual", title: `Organism ${this.id}`, placement: "left"
         })
         popOver.show()
     }
@@ -109,13 +136,13 @@ class OrganismDOM {
     }
 }
 
-function connectOrganisms(coordinates1, coordinates2) {
+function connectOrganisms(coordinates1, coordinates2, color="#149c61") {
     let line = document.createElementNS("http://www.w3.org/2000/svg", 'line');
     line.setAttribute("x1", (coordinates1[1]*20).toString())
     line.setAttribute("x2", (coordinates2[1]*20).toString())
     line.setAttribute("y1", (coordinates1[0]*20).toString())
     line.setAttribute("y2", (coordinates2[0]*20).toString())
-    line.setAttribute("stroke", "#149c61")
+    line.setAttribute("stroke", color)
     line.setAttribute("stroke-width", "2px")
     line.classList.add("line")
     SVGchildrenSpace.appendChild(line)
@@ -152,61 +179,56 @@ container.addEventListener("click", e => {
     x = Math.floor(e.pageY / 20)
     y = Math.floor(e.pageX / 20)
     console.log(`Fixed click on [${x}, ${y}]`)
-    for (organism of organisms) {
-        if (organism.isTouched(x, y)) {
-            organism.select()
-        } else if (organism.isSelected){
+    let chosen;
+    for (organism of organismsMap.values()) {
+        if (organism.isSelected) {
             organism.unselect()
+        } else if (organism.isTouched(x, y)){
+            chosen = organism
         }
     }
+    if (chosen !== undefined) chosen.select();
     // add warning when none touched
 })
 
-org1 = new OrganismDOM(5, 5, 6, 6)
-org2 = new OrganismDOM(20, 20, 6, 6)
-org1.addChildren(org2)
-organisms.push(org1)
-organisms.push(org2)
+// org1 = new OrganismDOM("a", 5, 5, 6, 6)
+// org2 = new OrganismDOM("b", 20, 20, 6, 6)
+// org1.addChildren(org2)
+// organismsMap.set("a", org1)
+// organismsMap.set("b", org2)
 
-// int parent_id;
-// int id;
-// int startx;
-// int starty;
-// int width;
-// int height;
-// int ptrx;
-// int ptry;
-// int deltax;
-// int deltay;
-// int ax;
-// int ay;
-// int bx;
-// int by;
-// int cx;
-// int cy;
-// int dx;
-// int dy;
-// int stackx[8];
-// int stacky[8];
-// int stacktop;
-// int errors;
-// // reproduction
-// int reproduction_cycle;
-// // child
-// int childx;
-// int childy;
-// int child_width;
-// int child_height;
-// int children;
+
 function update(startX, startY, width, height) {
     console.log("added new one")
     organisms.push(new OrganismDOM(startX, startY, width, height))
 }
 
-function updateDOMOrganisms(id, startX, startY, width, height, ptrx, ptry, deltaX, deltaY,
-    ax, ay, bx, by, cx, cy, dx, dy, stackX, stackY, stackTop, errors, reproduction_cycle, childeren) {
-        
 
+
+function updateDOMOrganisms(id, startX, startY, width, height, ptrx, ptry, deltaX, deltaY,
+     stackTop, errors, reproduction_cycle, parentId) {
+    let organism;
+    let parent = organismsMap.get(parentId)
+    if (organismsMap.has(id)) {
+        organism = organismsMap.get(id)
+    } else {
+        organism = new OrganismDOM(id, startX, startY, width, height)
+        organismsMap.set(id, organism)
+        if (parent !== undefined) {
+            parent.addChildren(organism)
+            organism.parent = parent
+        }
+    }
+
+    organism.stackTop = stackTop
+    organism.ptr = [ptrx, ptry]
+    organism.delta = [deltaX, deltaY]
+    // organism.a = [ax, ay]
+    // organism.b = [bx, by]
+    // organism.c = [cx, cy]
+    // organism.d = [dx, dy]
+    organism.errors = errors
+    organism.reproduction_cycle = reproduction_cycle
 }
 
 

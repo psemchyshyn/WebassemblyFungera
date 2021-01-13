@@ -67,3 +67,7 @@ body.modal-open {
     padding: 10px;
     margin: 10px 0px;
 }
+
+.popover {
+    white-space: pre-line;    
+}
