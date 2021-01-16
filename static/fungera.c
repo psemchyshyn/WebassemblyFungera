@@ -1064,10 +1064,11 @@ size_t iteration = 0;
 // id, startX, startY, width, height, ptrx, ptry, deltaX, deltaY,
 //     ax, ay, bx, by, cx, cy, dx, dy, stackTop, errors
 EMSCRIPTEN_KEEPALIVE
-void get_queue_info(queue *q) {
+void get_queue_info(queue *queue) {
 	organism *o;
-	for (size_t i = 0; i < q->top; i++) {
-		if (get_queue(q, o, i) == 0) {
+	int n = queue->top - 1;
+	for (int i = n; i >= 0; i--) {
+		if (get_queue(queue, o, i) == 0) {
 			EM_ASM({
 				newIds.add($0);
 				updateDOMOrganisms($0, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);
@@ -1084,7 +1085,7 @@ void get_queue_info(queue *q) {
 EMSCRIPTEN_KEEPALIVE
 int main() {
 	srand(time(0));
-	array_create(&arr, 300);
+	array_create(&arr, 500);
 	write_chunck_from_file(&arr, 24, 18, 23, 17, "initial.gen");
 	organism_create(&org, 24, 18, 23, 17, 0);
 
@@ -1098,19 +1099,18 @@ int main() {
 
 EMSCRIPTEN_KEEPALIVE
 int run(size_t iterations_to_run) {
-	size_t top, n, i = iteration;
+	size_t i = iteration;
 	while (iteration < i + iterations_to_run) {
-		top = 0;
-		n = q.top;
+		int j = q.top - 1;
 		//printf("\n\nITERATION %zu\n", iteration);
-		while (top < n) {
+		while (j >= 0) {
 			//get_queue(&q, &O, top);
-			if (get_queue(&q, &org, top) == 0) {
+			if (get_queue(&q, &org, j) == 0) {
 				//print_organism(&org);
 				life(&arr, &org, &q);
-				q.organisms[top] = org;
+				q.organisms[j] = org;
 			}
-			top++;
+			j--;
 		}
 		update_queue(&q, &arr);
 		iteration++;

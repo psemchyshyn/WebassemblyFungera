@@ -9,7 +9,7 @@ const maxChildrenDOM = document.getElementById("max-children")
 const organismsMap = new Map()
 const commands = ['.', ':', 'a', 'b', 'c', 'd', 'x', 'y', '^', 'v', '>', '<', '&', '?', '1', '0', '-', '+', '~', 'L', 'W', '@', '$', 'S', 'P'];
 
-const size = 300
+const size = 500
 let newIds = new Set()
 let popOver;
 let runIterations;
@@ -35,7 +35,7 @@ class OrganismDOM {
         this.width = width
         this.height = height
         this.isSelected = false
-        this.children = []
+        this.children = new Set()
         this.init()
 
 
@@ -76,6 +76,7 @@ class OrganismDOM {
         this.toggleDOMCol("Red")
         this.hookPopOver()
         this.selectChildrenDOM()
+        this.selectParentDOM()
         this.isSelected = true
     }
 
@@ -83,6 +84,7 @@ class OrganismDOM {
         this.toggleDOMCol("Red")
         this.clearPopOver()
         this.unselectChildrenDOM()
+        //this.unselectParentDOM()
         this.isSelected = false
     }
 
@@ -100,7 +102,7 @@ class OrganismDOM {
         size: [${this.width},${this.height}]
         coors: [${this.startX},${this.startY}]
         amount of stack elements: ${this.stackTop}
-        children amount: ${this.children.length}
+        children amount: ${this.children.size}
         next command: [${this.ptr}]
         delta: [${this.delta}]
         errors: ${this.errors}
@@ -154,16 +156,15 @@ class OrganismDOM {
         }
     }
 
+    selectParentDOM() {
+        if (organismsMap.has(this.parentId)) {
+            let parent = organismsMap.get(this.parentId)
+            connectCoors(this.getCenterCoordinates(), parent.getCenterCoordinates(), "#eaed24")
+        }
+    }
+
     unselectChildrenDOM() {
         SVGchildrenSpace.textContent = ""
-    }
-
-    addChildren(org) {
-        this.children.push(org)
-    }
-
-    removeChildren(org) {
-        this.children = this.children.filter(el => el !== org)
     }
 }
 
@@ -204,21 +205,7 @@ function fillMemory(numOfRow) {
 }
 
 
-container.addEventListener("click", e => {
-    let x, y;
-    x = Math.floor(e.pageY / 20)
-    y = Math.floor(e.pageX / 20)
-    let chosen;
-    for (organism of organismsMap.values()) {
-        if (organism.isSelected) {
-            organism.unselect()
-        } else if (organism.isTouched(x, y)){
-            chosen = organism
-        }
-    }
-    if (chosen !== undefined) chosen.select();
-})
-
+// Cells
 function checkOutOfBound(x, y) {
     return (x <= size && x > 0 & y <= size && y >= 0)
 }
@@ -235,19 +222,24 @@ function updateCell(x, y, sym) {
         cell.textContent = sym
     }
 }
+// 
 
+// run after each cycle of iterations
 function clearDead(queueIds, organisms) {
     let organism, parent;
     for (key of organisms.keys()) {
+        organism = organisms.get(key)
+        parent = organisms.get(organism.parentId)
         if (!queueIds.has(key)) {
-            organism = organisms.get(key)
-            parent = organisms.get(organism.parentId)
-            if (parent !== undefined) {
-                parent.removeChildren(organism)
+            // parent may be already dead, so we check
+            if (parent !== undefined && parent.children.has(organism)) {
+                parent.delete(organism)
             }
             organisms.delete(key)
             organism.kill()
             deadAmount++;
+        } else {
+            parent.children.add(organism)
         }
     }
     aliveAmount = organisms.size
@@ -261,8 +253,8 @@ function getOrgWithMostChilren(organisms) {
     let children_amount = -1;
     let most_chld_org;
     for (org of organisms.values()) {
-        if (org.children.length > children_amount) {
-            children_amount = org.children.length
+        if (org.children.size > children_amount) {
+            children_amount = org.children.size
             most_chld_org = org
         }
     }
@@ -282,8 +274,9 @@ function updateInfoDOM() {
     deadDOM.innerHTML = deadAmount
     aliveDOM.innerHTML= aliveAmount
     sizesDOM.innerHTML = JSON.stringify(genotypes)
-    maxChildrenDOM.innerHTML = orgWithMostChildren.children.length
+    maxChildrenDOM.innerHTML = orgWithMostChildren.children.size
 }
+
 
 function updateDOMOrganisms(id, startX, startY, width, height, ptrx, ptry, deltaX, deltaY,
      stackTop, errors, reproduction_cycle, parentId) {
@@ -294,33 +287,43 @@ function updateDOMOrganisms(id, startX, startY, width, height, ptrx, ptry, delta
         height = temp
     }
     let organism;
-    let parent = organismsMap.get(parentId)
     if (organismsMap.has(id)) {
         organism = organismsMap.get(id)
-        
     } else {
         organism = new OrganismDOM(id, startX, startY, width, height)
         organism.parentId = parentId
         organismsMap.set(id, organism)
         updateGenotypes(width, height)
-        if (parent !== undefined) {
-            parent.addChildren(organism)
-        }
     }
-
 
     if (organism.getOrganismCell(ptrx, ptry) !== undefined) {
         organism.markNextCommand(ptrx, ptry)
         organism.ptr = [ptrx, ptry]
     }
+
     organism.stackTop = stackTop
     organism.delta = [deltaX, deltaY]
+    organism.errors = errors
+    organism.reproduction_cycle = reproduction_cycle
     // organism.a = [ax, ay]
     // organism.b = [bx, by]
     // organism.c = [cx, cy]
     // organism.d = [dx, dy]
-    organism.errors = errors
-    organism.reproduction_cycle = reproduction_cycle
 }
 
 
+
+container.addEventListener("click", e => {
+    let x, y;
+    x = Math.floor(e.pageY / 20)
+    y = Math.floor(e.pageX / 20)
+    let chosen;
+    for (organism of organismsMap.values()) {
+        if (organism.isSelected) {
+            organism.unselect()
+        } else if (organism.isTouched(x, y)){
+            chosen = organism
+        }
+    }
+    if (chosen !== undefined) chosen.select();
+})

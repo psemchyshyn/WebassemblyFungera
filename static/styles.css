@@ -11,13 +11,13 @@ body.modal-open {
 
 #simulation {
     position: relative;
-    width: 6000px;
+    width: 10000px;
     /* z-index: -1; */
 }
 
 
 .row {
-    width: 6000px;
+    width: 10000px;
     height:20px;
 }
 
