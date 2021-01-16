@@ -2,13 +2,21 @@
 const container = document.querySelector(".containerSim")
 const SVGchildrenSpace = document.getElementById("childrenSpace")
 const iterationsInModal = document.getElementById("modalIteration") 
+const deadDOM = document.getElementById("dead")
+const aliveDOM = document.getElementById("alive")
+const sizesDOM = document.getElementById("sizes")
+const maxChildrenDOM = document.getElementById("max-children")
 const organismsMap = new Map()
 const commands = ['.', ':', 'a', 'b', 'c', 'd', 'x', 'y', '^', 'v', '>', '<', '&', '?', '1', '0', '-', '+', '~', 'L', 'W', '@', '$', 'S', 'P'];
 
 const size = 300
-let newIds = new Set();
+let newIds = new Set()
 let popOver;
 let runIterations;
+let deadAmount = 0;
+let aliveAmount = 0;
+let orgWithMostChildren;
+let genotypes = [[23, 17]];
 
 
 
@@ -209,7 +217,6 @@ container.addEventListener("click", e => {
         }
     }
     if (chosen !== undefined) chosen.select();
-    // add warning when none touched
 })
 
 function checkOutOfBound(x, y) {
@@ -240,10 +247,42 @@ function clearDead(queueIds, organisms) {
             }
             organisms.delete(key)
             organism.kill()
+            deadAmount++;
         }
     }
+    aliveAmount = organisms.size
+    orgWithMostChildren = getOrgWithMostChilren(organisms)
+    updateInfoDOM()
     newIds.clear()
     console.log(organisms)
+}
+
+function getOrgWithMostChilren(organisms) {
+    let children_amount = -1;
+    let most_chld_org;
+    for (org of organisms.values()) {
+        if (org.children.length > children_amount) {
+            children_amount = org.children.length
+            most_chld_org = org
+        }
+    }
+    return most_chld_org
+}
+
+function updateGenotypes(width, height) {
+    for (el of genotypes) {
+        if (el[0] != width || el[1] != height) {
+            genotypes.push([width, height])
+            break;
+        }
+    }
+}
+
+function updateInfoDOM() {
+    deadDOM.innerHTML = deadAmount
+    aliveDOM.innerHTML= aliveAmount
+    sizesDOM.innerHTML = JSON.stringify(genotypes)
+    maxChildrenDOM.innerHTML = orgWithMostChildren.children.length
 }
 
 function updateDOMOrganisms(id, startX, startY, width, height, ptrx, ptry, deltaX, deltaY,
@@ -263,16 +302,17 @@ function updateDOMOrganisms(id, startX, startY, width, height, ptrx, ptry, delta
         organism = new OrganismDOM(id, startX, startY, width, height)
         organism.parentId = parentId
         organismsMap.set(id, organism)
+        updateGenotypes(width, height)
         if (parent !== undefined) {
             parent.addChildren(organism)
         }
     }
+
+
     if (organism.getOrganismCell(ptrx, ptry) !== undefined) {
         organism.markNextCommand(ptrx, ptry)
         organism.ptr = [ptrx, ptry]
     }
-
-
     organism.stackTop = stackTop
     organism.delta = [deltaX, deltaY]
     // organism.a = [ax, ay]

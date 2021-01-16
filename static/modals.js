@@ -30,16 +30,15 @@ runBtn.addEventListener("click", () => {
 })
 
 document.addEventListener("keydown", (e) => {
-    e.preventDefault()
     if (e.keyCode == 32) {
         simInfoModal.show()
-    } else if (e.keyCode == 39) {
+    } else if (e.keyCode == 68) {
         runIterations(1);
-    } else if (e.keyCode == 40) {
+    } else if (e.keyCode == 83) {
         runIterations(5000);
-    } else if (e.keyCode == 37) {
+    } else if (e.keyCode == 65) {
         runIterations(5000);
-    } else if (e.keyCode == 38) {
+    } else if (e.keyCode == 87) {
         runIterations(30000)
     }
 })
