@@ -25,11 +25,21 @@ showInfobtn.addEventListener("click", () => {
 
 runBtn.addEventListener("click", () => {
     simInfoModal.hide()
-    setTimeout(() => {runIterations(parseInt(slider.value))}, 500)
+    //runIterations(parseInt(slider.value))
+    window.setTimeout(() => {runIterations(parseInt(slider.value))}, 300)
 })
 
-document.addEventListener("keyup", (e) => {
+document.addEventListener("keydown", (e) => {
+    e.preventDefault()
     if (e.keyCode == 32) {
         simInfoModal.show()
+    } else if (e.keyCode == 39) {
+        runIterations(1);
+    } else if (e.keyCode == 40) {
+        runIterations(5000);
+    } else if (e.keyCode == 37) {
+        runIterations(5000);
+    } else if (e.keyCode == 38) {
+        runIterations(30000)
     }
 })
