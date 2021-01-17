@@ -1614,10 +1614,10 @@ var tempI64;
 
 var ASM_CONSTS = {
   1071: function($0, $1, $2) {updateCell($0, $1, commands[$2]);},  
- 1111: function($0, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) {newIds.add($0); updateDOMOrganisms($0, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);},  
- 1206: function() {clearDead(newIds, organismsMap);},  
- 1255: function() {alert("Data initialized. Ready for starting simulation");},  
- 1317: function($0) {updateIteration($0);}
+ 1111: function($0, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) {newIds.add($0); updateDOMOrganisms($0, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);},  
+ 1211: function() {clearDead(newIds, organismsMap);},  
+ 1260: function() {alert("Data initialized. Ready for starting simulation");},  
+ 1322: function($0) {updateIteration($0);}
 };
 
 

@@ -78,3 +78,39 @@ body.modal-open {
 .popover {
     white-space: pre-line;    
 }
+
+
+/* 
+tree
+*/
+
+
+.node circle, .node rect {
+    fill: #fff;
+    stroke-width: 1.5px;
+  }
+  
+  .decade circle {
+    fill: none;
+    stroke: lightgrey;
+    stroke-width: 0.5px;
+  }
+  
+  .node {
+    font: 10px sans-serif;
+  }
+  
+  .decade {
+    font: 8px sans-serif;
+  }
+  
+  .title {
+    font: 12px sans-serif;
+  }
+  
+  .link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 1.5px;
+  }
+  

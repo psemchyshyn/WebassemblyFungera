@@ -26,7 +26,7 @@ Module.onRuntimeInitialized = () => {
 }
 
 class OrganismDOM {
-    constructor(id, startX, startY, width, height) {
+    constructor(id, startX, startY, width, height, born) {
         
 
         this.id = id
@@ -36,6 +36,7 @@ class OrganismDOM {
         this.height = height
         this.isSelected = false
         this.children = new Set()
+        this.born = born;
         this.init()
 
 
@@ -84,7 +85,6 @@ class OrganismDOM {
         this.toggleDOMCol("Red")
         this.clearPopOver()
         this.unselectChildrenDOM()
-        //this.unselectParentDOM()
         this.isSelected = false
     }
 
@@ -99,6 +99,7 @@ class OrganismDOM {
 
     displayInfo() {
         return `parent id: ${this.parentId}
+        born: ${this.born}
         size: [${this.width},${this.height}]
         coors: [${this.startX},${this.startY}]
         amount of stack elements: ${this.stackTop}
@@ -229,6 +230,7 @@ function clearDead(queueIds, organisms) {
     let organism, parent;
     for (key of organisms.keys()) {
         organism = organisms.get(key)
+        //console.log(JSON.stringify(organism))
         parent = organisms.get(organism.parentId)
         if (!queueIds.has(key)) {
             // parent may be already dead, so we check
@@ -239,7 +241,7 @@ function clearDead(queueIds, organisms) {
             organism.kill()
             deadAmount++;
         } else {
-            parent.children.add(organism)
+            if (key != 0) parent.children.add(organism)
         }
     }
     aliveAmount = organisms.size
@@ -279,7 +281,7 @@ function updateInfoDOM() {
 
 
 function updateDOMOrganisms(id, startX, startY, width, height, ptrx, ptry, deltaX, deltaY,
-     stackTop, errors, reproduction_cycle, parentId) {
+     stackTop, errors, reproduction_cycle, parentId, born) {
     // hardcoded shit
     if (id !== 0) {
         temp = width
@@ -290,7 +292,7 @@ function updateDOMOrganisms(id, startX, startY, width, height, ptrx, ptry, delta
     if (organismsMap.has(id)) {
         organism = organismsMap.get(id)
     } else {
-        organism = new OrganismDOM(id, startX, startY, width, height)
+        organism = new OrganismDOM(id, startX, startY, width, height, born)
         organism.parentId = parentId
         organismsMap.set(id, organism)
         updateGenotypes(width, height)

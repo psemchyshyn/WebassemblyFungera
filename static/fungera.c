@@ -1071,9 +1071,9 @@ void get_queue_info(queue *queue) {
 		if (get_queue(queue, o, i) == 0) {
 			EM_ASM({
 				newIds.add($0);
-				updateDOMOrganisms($0, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);
+				updateDOMOrganisms($0, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);
 			}, o->id, o->startx, o->starty, o->width, o->height, o->ptrx, o->ptry, o->deltax, o->deltay, o->stacktop,
-			o->errors, o->reproduction_cycle, o->parent_id);
+			o->errors, o->reproduction_cycle, o->parent_id, iteration);
 		}
 		// registers not added
 	}
