@@ -1,3 +1,5 @@
+let treePopover;
+
 class SerializedOrg {
     constructor(org) {
         this.born = org.born
@@ -99,7 +101,25 @@ var svg = d3.select("#treeZone").append("svg")
 
 
 
-///////////////////////////
+function hookTreePopover (target, organism){
+    treePopover =  new bootstrap.Popover(target,  {
+        content: organism.displayInfo(), trigger: "manual", title: `Organism ${organism.id}`, placement: "left"
+    })
+    treePopover.show()
+}
+
+document.getElementById("treeZone").addEventListener("click", (e) => {
+    if (treePopover !== undefined) {
+        treePopover.hide()
+    } 
+    e = e || window.event;
+    var target = e.target || e.srcElement,
+        text = target.textContent || target.innerText;
+    if (target.tagName == "text") {
+        hookTreePopover(target, organismsMap.get(parseInt(text)))
+        console.log(organismsMap.get(parseInt(text)))
+    }   
+});
 
 
 

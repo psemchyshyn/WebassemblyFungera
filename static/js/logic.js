@@ -143,6 +143,7 @@ class OrganismDOM {
             content: this.displayInfo(), trigger: "manual", title: `Organism ${this.id}`, placement: "left"
         })
         popOver.show()
+        console.log("showing popover")
     }
 
     clearPopOver() {

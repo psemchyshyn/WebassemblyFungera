@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
     <div id="simulation">
@@ -29,7 +29,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div id="treeZone"></div>
+          <div id="treeZone" class="text-center"></div>
         </div>
       </div>    
     </div>
@@ -67,8 +67,8 @@
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
-<script src="{{ url_for('static', filename='main.js') }}"></script>
-<script async type="text/javascript" src="{{url_for('static', filename='modals.js')}}"></script>
-<script async type="text/javascript" src="{{ url_for('static', filename='logic.js') }}"></script>
-<script async type="text/javascript" src="{{ url_for ('static', filename='tree.js')}}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script async type="text/javascript" src="{{url_for('static', filename='js/modals.js')}}"></script>
+<script async type="text/javascript" src="{{ url_for('static', filename='js/logic.js') }}"></script>
+<script async type="text/javascript" src="{{ url_for ('static', filename='js/tree.js')}}"></script>
 </html>

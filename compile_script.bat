@@ -1,0 +1,1 @@
+emcc simulation/fungera.c -o static/js/main.js -s EXPORTED_FUNCTIONS=["_main","_run"] -s EXTRA_EXPORTED_RUNTIME_METHODS=["cwrap"] -s WASM=1 --embed-file initial.gen

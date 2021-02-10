@@ -6,6 +6,7 @@
 #include <emscripten/html5.h>
 
 
+
 int MAX_N_OF_ERRORS = 5000;
 int MAX_ITERS_WITHOUT_REPRODUCTION = 100000;
 int TEMPLATE[1024];
@@ -60,6 +61,7 @@ typedef struct {
 	int size;
 	organism *organisms;
 } queue;
+
 
 int kill_organism(organism org, array* memory);
 
@@ -1055,11 +1057,12 @@ int radiation(array* memory) {
 }
 
 
+////////
 array arr;
 organism org; 
 queue q;
 size_t iteration = 0;
-
+//////////
 
 // id, startX, startY, width, height, ptrx, ptry, deltaX, deltaY,
 //     ax, ay, bx, by, cx, cy, dx, dy, stackTop, errors
@@ -1131,77 +1134,3 @@ int run(size_t iterations_to_run) {
 	get_queue_info(&q);
 	return 0;
 }
-
-
-
-// EMSCRIPTEN_KEEPALIVE
-// int main() {
-// 	// freopen("output.txt", "w", stdout);
-// 	array arr;
-// 	array_create(&arr, 200);
-// 	write_chunck_from_file(&arr, 1, 1, 23, 17, "initial.gen");
-
-// 	organism org;
-// 	organism_create(&org, 1, 1, 23, 17, 0);
-
-// 	queue q;
-// 	queue_create(&q);
-// 	append_queue(&q, &org);
-// 	size_t top, n;
-
-
-// 	// emscripten_request_animation_frame_loop(one_iteration, &data);  
-// 	for (size_t i = 0; i < 100000; i++) {
-// 		top = 0;
-// 		n = q.top;
-// 		printf("\n\nITERATION %zu\n", i);
-// 		while (top < n) {
-// 			//get_queue(&q, &O, top);
-// 			if (get_queue(&q, &org, top) == 0) {
-// 				//print_organism(&org);
-// 				life(&arr, &org, &q);
-// 				q.organisms[top] = org;
-// 			}
-// 			top++;
-// 		}
-// 		update_queue(&q);
-// 		if (i%1000 == 0) {
-// 			EM_ASM({
-// 				updateIteration($0);
-// 			}, i);
-// 		}
-//     }
-// 	EM_ASM({
-// 		alert("finish");
-// 	});
-// 	printf("hello\n");
-// 	return 0;
-// }  
-
-
-	
-
-// //	organism O;
-	// for (size_t i = 0; i < 200000; i++) {
-	// 	top = 0;
-	// 	n = q.top;
-	// 	printf("\n\nITERATION %d\n", i);
-	// 	while (top < n) {
-	// 		//get_queue(&q, &O, top);
-	// 		if (get_queue(&q, &org, top) == 0) {
-	// 			// print_organism(&org);
-	// 			life(&arr, &org, &q);
-	// 			q.organisms[top] = org;
-	// 		}
-	// 		top++;
-	// 	}
-	// 	update_queue(&q);
-	// 	// if (i%100 == 0) {
-	// 	// 	print_array(&arr);
-	// 	// }
-    // }
-	// free(arr.content);
-	// free(q.organisms);
-// 	return 0;
-
-
